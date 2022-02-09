@@ -1,1 +1,1 @@
-# JunpChessServer-USER
+# JumpChessServer-USER
