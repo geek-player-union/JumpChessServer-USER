@@ -22,7 +22,7 @@ func (s *session) loop() {
 			if message[0] == '\n' {
 				message = message[1:]
 			}
-			ret := handle(strings.Split(command, " "))
+			ret := handle(strings.Split(command, " ")) + "\n"
 			if len(ret) == 0 {
 				s.terminated = true
 			} else {
