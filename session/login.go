@@ -1,16 +1,33 @@
 package session
 
-import "fmt"
+import (
+	"github.com/geek-player-union/JumpChessServer-USER/database"
+	"strconv"
+)
 
-func handleLogin(commands []string) string {
+func handleLogin(commands []string) Instruction {
 	if len(commands) != 2 {
-		return "error"
+		return Instruction{
+			Command: "SYNTAX_ERROR",
+			Message: "invalid parameters for command 'login'",
+		}
 	}
-	uid := commands[0]
+
+	uidStr := commands[0]
 	password := commands[1]
+	uid, err := strconv.Atoi(uidStr)
+	if err != nil {
+		return Instruction{
+			Command: "SYNTAX_ERROR",
+			Message: "invalid uid format",
+		}
+	}
 
-	// TODO: login logic
-	fmt.Println(uid, password)
+	user, reason := database.CheckUserLogin(uid, password)
+	ret := Instruction{
+		Command: reason,
+		Data:    user,
+	}
 
-	return "OK"
+	return ret
 }

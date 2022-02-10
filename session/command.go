@@ -1,20 +1,35 @@
 package session
 
-import "fmt"
+import (
+	"encoding/json"
+	"strings"
+)
+
+type Instruction struct {
+	Command string
+	Message string
+	Data    interface{}
+}
 
 // 返回 true 代表可以结束 Socket
-func handle(commands []string) string {
-	// TODO: Delete
-	fmt.Println("Command received: " + fmt.Sprint(commands))
-
-	if len(commands) == 0 {
-		return "empty"
+func handle(command string) Instruction {
+	recv := &Instruction{}
+	err := json.Unmarshal([]byte(command), recv)
+	if err != nil {
+		return Instruction{
+			Command: "SYNTAX_ERROR",
+			Message: "invalid json syntax",
+		}
 	}
 
-	switch commands[0] {
-	case "login":
-		return handleLogin(commands[1:])
+	recv.Command = strings.ToUpper(recv.Command)
+	switch recv.Command {
+	case "LOGIN":
+		return handleLogin(strings.Split(recv.Message, " "))
 	default:
-		return "unknown"
+		return Instruction{
+			Command: "UNKNOWN_COMMAND",
+			Message: "unknown command error",
+		}
 	}
 }

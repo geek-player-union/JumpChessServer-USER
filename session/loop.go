@@ -1,6 +1,9 @@
 package session
 
-import "strings"
+import (
+	"encoding/json"
+	"strings"
+)
 
 func (s *session) loop() {
 	defer s.connection.Close()
@@ -22,7 +25,8 @@ func (s *session) loop() {
 			if message[0] == '\n' {
 				message = message[1:]
 			}
-			ret := handle(strings.Split(command, " ")) + "\n"
+			retBytes, _ := json.Marshal(handle(command))
+			ret := string(retBytes) + "\n"
 			if len(ret) == 0 {
 				s.terminated = true
 			} else {
