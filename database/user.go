@@ -18,7 +18,6 @@ type User struct {
 
 func (u *User) ToProtocolString() string {
     ret := fmt.Sprintf("USER %s %s %d %d %d ", u.Username, u.Avatar, u.Level, u.Exp, u.Coin)
-
     items := u.GetItems()
 
     var hasItem [ItemNumber]bool
@@ -46,10 +45,19 @@ func CheckUserLogin(uid string, password string) (*User, string) {
     user := &User{}
     has, _ := engine.Where("ID = ?", uid).Get(user)
 
-    if has && user.Password == password {
-        return user, "USER"     //OK
-    } else if has && user.Password != password {
-        return nil, "CODE_ERROR"
+    if has {
+        if user.Password == password && user.Online== false {
+            user.Online=true
+            _, err := engine.Update(user)
+            if err != nil {
+                return nil, "SERVER_ERROR"
+            }
+            return user, "USER"     //OK
+        } else if user.Password != password {
+            return nil, "CODE_ERROR"
+        } else {
+            return nil, "ONLINE_ERROR"
+        }
     } else {
         return nil, "ACCOUNT_ERROR"
     }
