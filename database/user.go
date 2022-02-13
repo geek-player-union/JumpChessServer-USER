@@ -15,6 +15,7 @@ type User struct {
     Banned   bool   `json:"banned" xorm:"bool notnull"`
     Online   bool   `json:"online" xorm:"bool notnull"`
     Rank     int64  `json:"rank" xorm:"bigint notnull"`
+    Assert   string `json:"assert" xorm:"varchar(50) notnull"`
 }
 
 func (u *User) ToProtocolString() string {

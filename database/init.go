@@ -11,5 +11,10 @@ var engine *xorm.Engine
 func Init() {
 	dbConnectStr := fmt.Sprintf("%s:%s", config.MysqlUsername, config.MysqlPassword)
 
-	engine, _ = xorm.NewEngine("mysql", dbConnectStr)
+	var err error
+	engine, err = xorm.NewEngine("mysql", dbConnectStr)
+
+	if err != nil {
+		return
+	}
 }
