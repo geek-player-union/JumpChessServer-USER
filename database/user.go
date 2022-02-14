@@ -43,6 +43,33 @@ func (u *User) GetItems() []Item {
     return nil
 }
 
+func BetItems(uid string, password string, ItemId int) (bool, string) {
+    user := &User{}
+    has, _ := engine.Where("ID = ?", uid).Get(user)
+
+    if has {
+        if user.Password == password && user.Assert[ItemId] == '0' && user.Coin >= Items[ItemId].Price {
+            AssertBytes := []byte(user.Assert)
+            AssertBytes[ItemId] = '1'
+            user.Assert =string(AssertBytes)
+            user.Coin-=Items[ItemId].Price
+            _, err := engine.Update(user)
+            if err != nil {
+                return false, "SERVER_ERROR"
+            }
+            return true, "BUY_DONE"
+        } else if user.Password != password {
+            return false, "CONFIRM_ERROR"
+        }else if user.Assert[ItemId] == '1' {
+            return false, "RECURRING_ERROR"
+        } else {
+            return false, "COIN_ERROR"
+        }
+    } else {
+        return false,"DATABASE_ERROR"
+    }
+}
+
 func CheckUserLogin(uid string, password string) (*User, string) {
     user := &User{}
     has, _ := engine.Where("ID = ?", uid).Get(user)
