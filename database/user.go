@@ -27,7 +27,7 @@ func (u *User) ToJsonString() string {
 	return string(ret)
 }
 
-func BuyItems(id int64, ItemId int) string {
+func BuyItem(id int64, ItemId int) string {
 	user := &User{ID: id}
 	has, _ := engine.Get(user)
 
@@ -51,7 +51,7 @@ func BuyItems(id int64, ItemId int) string {
 	if err != nil {
 		return "DATABASE_ERROR"
 	}
-	
+
 	return "BUY_DONE"
 }
 

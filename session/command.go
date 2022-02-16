@@ -11,7 +11,6 @@ type Instruction struct {
 	Data    interface{}
 }
 
-// 返回 true 代表可以结束 Socket
 func handle(command string) Instruction {
 	recv := &Instruction{}
 	err := json.Unmarshal([]byte(command), recv)

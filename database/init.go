@@ -12,7 +12,7 @@ func Init() {
 	dbConnectStr := fmt.Sprintf("%s:%s", config.MysqlUsername, config.MysqlPassword)
 
 	var err error
-	engine, err = xorm.NewEngine("mysql", dbConnectStr)
+	engine, err = xorm.NewEngine(config.MysqlDBName, dbConnectStr)
 
 	if err != nil {
 		return
