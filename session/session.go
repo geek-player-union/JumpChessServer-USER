@@ -3,7 +3,7 @@ package session
 import "net"
 
 type session struct {
-	uid        int
+	uid        int64
 	connection net.Conn
 	terminated bool
 }

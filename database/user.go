@@ -2,6 +2,7 @@ package database
 
 import (
 	"encoding/json"
+	"strconv"
 )
 
 type User struct {
@@ -27,52 +28,66 @@ func (u *User) ToJsonString() string {
 	return string(ret)
 }
 
-func BuyItem(id int64, ItemId int) string {
-	user := &User{ID: id}
-	has, _ := engine.Get(user)
-
-	if !has {
-		return "DATABASE_ERROR"
-	}
-
-	if user.Assert[ItemId] != '0' {
+func (u *User) BuyItem(ItemId int) string {
+	if u.Assert[ItemId] != '0' {
 		return "RECURRING_ERROR"
 	}
 
-	if user.Coin < Items[ItemId].Price {
+	if u.Coin < Items[ItemId].Price {
 		return "COIN_NOT_ENOUGH"
 	}
 
-	assertBytes := []byte(user.Assert)
+	assertBytes := []byte(u.Assert)
 	assertBytes[ItemId] = '1'
-	user.Assert = string(assertBytes)
-	user.Coin -= Items[ItemId].Price
-	_, err := engine.Update(user)
-	if err != nil {
-		return "DATABASE_ERROR"
+	u.Assert = string(assertBytes)
+	u.Coin -= Items[ItemId].Price
+	if !u.Update() {
+		return "SERVER_ERROR"
 	}
 
 	return "BUY_DONE"
 }
 
-func CheckUserLogin(uid string, password string) (*User, string) {
-	user := &User{}
-	has, _ := engine.Where("ID = ?", uid).Get(user)
-
-	if has {
-		if user.Password == password && user.Online == false {
-			user.Online = true
-			_, err := engine.Update(user)
-			if err != nil {
-				return nil, "SERVER_ERROR"
-			}
-			return user, "USER" //OK
-		} else if user.Password != password {
-			return nil, "CODE_ERROR"
-		} else {
-			return nil, "ONLINE_ERROR"
-		}
-	} else {
-		return nil, "ACCOUNT_ERROR"
+func (u *User) Update() bool {
+	_, err := engine.Update(u)
+	if err != nil {
+		return false
 	}
+	return true
+}
+
+func GetUserById(uid int64) *User {
+	user := &User{ID: uid}
+	has, err := engine.Get(user)
+	if !has || err != nil {
+		return nil
+	}
+	return user
+}
+
+func CheckUserLogin(uid string, password string) (*User, string) {
+	id, err := strconv.Atoi(uid)
+	if err != nil {
+		return nil, "INVALID_ACCOUNT"
+	}
+
+	user := GetUserById(int64(id))
+	if user == nil {
+		return nil, "NO_SUCH_USER"
+	}
+
+	if user.Password != password {
+		return nil, "CODE_ERROR"
+	}
+
+	if user.Online {
+		return nil, "ONLINE_ERROR"
+	}
+
+	user.Online = true
+	if !user.Update() {
+		return nil, "SERVER_ERROR"
+	}
+
+	return user, "USER"
 }

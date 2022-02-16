@@ -11,7 +11,7 @@ type Instruction struct {
 	Data    interface{}
 }
 
-func handle(command string) Instruction {
+func handle(command string, s *session) Instruction {
 	recv := &Instruction{}
 	err := json.Unmarshal([]byte(command), recv)
 	if err != nil {
@@ -24,7 +24,11 @@ func handle(command string) Instruction {
 	recv.Command = strings.ToUpper(recv.Command)
 	switch recv.Command {
 	case "LOGIN":
-		return handleLogin(strings.Split(recv.Message, " "))
+		ret, uid := handleLogin(recv.Data)
+		s.uid = uid
+		return ret
+	case "BUY":
+		return handleBuy(recv.Data, s.uid)
 	default:
 		return Instruction{
 			Command: "UNKNOWN_COMMAND",

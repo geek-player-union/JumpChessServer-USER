@@ -25,7 +25,7 @@ func (s *session) loop() {
 			if message[0] == '\n' {
 				message = message[1:]
 			}
-			retBytes, _ := json.Marshal(handle(command))
+			retBytes, _ := json.Marshal(handle(command, s))
 			ret := string(retBytes) + "\n"
 			if len(ret) == 0 {
 				s.terminated = true

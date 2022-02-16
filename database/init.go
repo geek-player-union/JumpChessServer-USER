@@ -13,8 +13,12 @@ func Init() {
 
 	var err error
 	engine, err = xorm.NewEngine(config.MysqlDBName, dbConnectStr)
-
 	if err != nil {
-		return
+		panic(err)
+	}
+
+	err = engine.Sync2(User{})
+	if err != nil {
+		panic(err)
 	}
 }
