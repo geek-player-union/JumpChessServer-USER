@@ -2,6 +2,6 @@ package config
 
 const (
 	MysqlUsername = "root"
-	MysqlPassword = "Elpsycongroo"
+	MysqlPassword = ""
 	MysqlDBName   = "jump_chess"
 )

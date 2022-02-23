@@ -13,6 +13,7 @@ type Instruction struct {
 
 func handle(command string, s *session) Instruction {
 	recv := &Instruction{}
+	send := Instruction{}
 	err := json.Unmarshal([]byte(command), recv)
 	if err != nil {
 		return Instruction{
@@ -22,17 +23,31 @@ func handle(command string, s *session) Instruction {
 	}
 
 	recv.Command = strings.ToUpper(recv.Command)
+	send.Command = recv.Command + "_"
+	var message string
+	var data interface{}
+
 	switch recv.Command {
 	case "LOGIN":
-		ret, uid := handleLogin(recv.Data)
-		s.uid = uid
-		return ret
+		message, data = handleLogin(recv.Data)
+		if len(message) == 0 {
+			s.uid = data.(int64)
+		}
 	case "BUY":
-		return handleBuy(recv.Data, s.uid)
+		message = handleBuy(recv.Data, s.uid)
 	default:
 		return Instruction{
-			Command: "UNKNOWN_COMMAND",
-			Message: "unknown command error",
+			Command: "UNKNOWN_ERROR",
 		}
 	}
+
+	if len(message) == 0 {
+		send.Command += "DONE"
+	} else {
+		send.Command += "ERROR"
+	}
+
+	send.Message = message
+	send.Data = data
+	return send
 }
