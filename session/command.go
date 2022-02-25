@@ -2,6 +2,7 @@ package session
 
 import (
 	"encoding/json"
+	"github.com/geek-player-union/JumpChessServer-USER/database"
 	"strings"
 )
 
@@ -30,8 +31,8 @@ func handle(command string, s *session) Instruction {
 	switch recv.Command {
 	case "LOGIN":
 		message, data = handleLogin(recv.Data)
-		if len(message) == 0 {
-			s.uid = data.(int64)
+		if data != nil {
+			s.uid = data.(*database.User).ID
 		}
 	case "BUY":
 		message = handleBuy(recv.Data, s.uid)

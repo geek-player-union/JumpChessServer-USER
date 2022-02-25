@@ -55,19 +55,19 @@ func GetUserById(uid int64) *User {
 	return user
 }
 
-func CheckUserLogin(uid string, password string) (string, int64) {
+func CheckUserLogin(uid string, password string) (string, *User) {
 	id, err := strconv.Atoi(uid)
 	if err != nil {
-		return "ACCOUNT_ERROR", -1
+		return "ACCOUNT_ERROR", nil
 	}
 
 	user := GetUserById(int64(id))
 	if user == nil {
-		return "ACCOUNT_ERROR", -1
+		return "ACCOUNT_ERROR", nil
 	}
 
 	if user.Password != password {
-		return "CODE_ERROR", -1
+		return "CODE_ERROR", nil
 	}
 
 	//if user.Online {
@@ -76,8 +76,8 @@ func CheckUserLogin(uid string, password string) (string, int64) {
 
 	user.Online = true
 	if !user.Update() {
-		return "SERVER_ERROR", -1
+		return "SERVER_ERROR", nil
 	}
 
-	return "", user.ID
+	return "", user
 }
