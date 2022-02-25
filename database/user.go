@@ -70,9 +70,9 @@ func CheckUserLogin(uid string, password string) (string, int64) {
 		return "CODE_ERROR", -1
 	}
 
-	if user.Online {
-		return "ONLINE_ERROR", -1
-	}
+	//if user.Online {
+	//	return "ONLINE_ERROR", -1
+	//}
 
 	user.Online = true
 	if !user.Update() {
