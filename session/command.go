@@ -13,6 +13,7 @@ type Instruction struct {
 }
 
 func handle(command string, s *session) Instruction {
+	command = strings.Replace(command, "\x00", "", -1)
 	recv := &Instruction{}
 	send := Instruction{}
 	err := json.Unmarshal([]byte(command), recv)

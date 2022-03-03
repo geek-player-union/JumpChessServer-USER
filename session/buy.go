@@ -3,15 +3,13 @@ package session
 import "github.com/geek-player-union/JumpChessServer-USER/database"
 
 func handleBuy(d interface{}, uid int64) string {
-	data, ok := d.(struct {
-		ItemId int `json:"itemid"`
-	})
+	data, ok := d.(map[string]interface{})
 
 	if !ok {
 		return "SYNTAX_ERROR"
 	}
-
-	if data.ItemId >= database.ItemNumber || data.ItemId < 0 {
+	itemID := data["itemid"].(float64)
+	if itemID >= database.ItemNumber || itemID < 0 {
 		return "INVALID_ITEM"
 	}
 
@@ -20,5 +18,5 @@ func handleBuy(d interface{}, uid int64) string {
 		return "NEED_LOGIN"
 	}
 
-	return user.BuyItem(data.ItemId)
+	return user.BuyItem(int(itemID))
 }
